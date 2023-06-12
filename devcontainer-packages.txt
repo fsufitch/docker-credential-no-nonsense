@@ -1,6 +1,7 @@
 bash-completion
 curl
 file
+gcc-go
 git
 golang
 gzip

@@ -13,14 +13,15 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "eamodio.gitlens",
-                "yzhang.markdown-all-in-one",
-                "wdhongtw.gpg-indicator",
-                "foxundermoon.shell-format",
-                "github.vscode-pull-request-github",
-                "ms-vscode.remote-repositories",
-                "golang.go"
-            ],
+				"eamodio.gitlens",
+				"yzhang.markdown-all-in-one",
+				"wdhongtw.gpg-indicator",
+				"foxundermoon.shell-format",
+				"github.vscode-pull-request-github",
+				"ms-vscode.remote-repositories",
+				"golang.go",
+				"ms-vscode.makefile-tools"
+			],
             "settings": {
                 "remote.containers.cacheVolume": true
             }
