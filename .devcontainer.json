@@ -1,0 +1,29 @@
+{
+    "name": "No-Nonsense Docker Creds Devcontainer",
+    "build": {
+	    "context": ".",
+	    "dockerfile": "Dockerfile",
+	    "target": "devcontainer"
+    },
+    "workspaceFolder": "/home/developer/docker-credential-no-nonsense",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/developer/docker-credential-no-nonsense,type=bind,consistency=cached",
+    "remoteUser": "developer",
+    "containerUser": "developer",
+    "overrideCommand": true,
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "eamodio.gitlens",
+                "yzhang.markdown-all-in-one",
+                "wdhongtw.gpg-indicator",
+                "foxundermoon.shell-format",
+                "github.vscode-pull-request-github",
+                "ms-vscode.remote-repositories",
+                "golang.go"
+            ],
+            "settings": {
+                "remote.containers.cacheVolume": true
+            }
+        }
+    }
+}
