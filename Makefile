@@ -9,6 +9,7 @@ DISTS ?= linux/amd64 windows/amd64
 
 
 default:
+	echo ${SOURCES}
 	TARGETS=''; \
 	for dist in $$(echo '${DISTS}' | grep -Eo '\S+'); do \
 		if [ -z "$$(echo $$dist | grep '^windows/')" ]; then \
@@ -30,7 +31,7 @@ clean:
 	rm -rf dist
 .PHONY: clean
 
-dist/%/docker-credential-no-nonsense:
+dist/%/docker-credential-no-nonsense: ${SOURCES}
 	@echo '$@' | ( grep -v 'dist/windows' > /dev/null ) || ( echo "ERROR: Windows build must have .exe suffix" && exit 1 )
 	@\
 		export GOOS="$$(echo '$@' | sed -E 's@^dist/([^/]+)/.*@\1@')"; \
@@ -38,7 +39,7 @@ dist/%/docker-credential-no-nonsense:
 		echo "Building... GOOS=$$GOOS GOARCH=$$GOARCH"; \
 		go build ${GOARGS} -o '$@' '${CMDPKG}'
 
-dist/%/docker-credential-no-nonsense.exe:
+dist/%/docker-credential-no-nonsense.exe: ${SOURCES}
 	@echo '$@' | ( grep '^dist/windows/' > /dev/null ) || (echo "ERROR: non-Windows may not have .exe suffix" >&2 && exit 1)
 	@\
 		export GOOS="$$(echo '$@' | sed -E 's@^dist/([^/]+)/.*@\1@')"; \

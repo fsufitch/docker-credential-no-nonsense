@@ -1,6 +1,7 @@
 package dkr_nn
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -37,7 +38,7 @@ func Load(path string) (*CredentialFile, error) {
 		path = CREDFILE
 	}
 
-	loadedFile := CredentialFile{}
+	loadedFile := CredentialFile{Credentials: map[string]CredentialPair{}}
 
 	byts, err := os.ReadFile(path)
 	if os.IsNotExist(err) {
@@ -61,8 +62,11 @@ func (cf CredentialFile) Save(path string) error {
 	if err != nil {
 		return fmt.Errorf("could not serialize cred file: %w", err)
 	}
+	prettyData := bytes.Buffer{}
+	json.Indent(&prettyData, data, "", "\t")
+	fmt.Fprintln(&prettyData)
 
-	err = os.WriteFile(path, data, 0)
+	err = os.WriteFile(path, prettyData.Bytes(), 0644)
 	if err != nil {
 		return fmt.Errorf("failed to write creds file '%s': %w", path, err)
 	}
@@ -89,13 +93,17 @@ func (cf CredentialFile) GetCredentials(enc Encryption, key string) (username st
 	return
 }
 
-func (cf CredentialFile) SetCredentials(enc Encryption, key string, username string, password string) {
-	encryptedPassword := enc.Encrypt([]byte(password))
+func (cf CredentialFile) SetCredentials(enc Encryption, key string, username string, password string) error {
+	encryptedPassword, err := enc.Encrypt([]byte(password))
+	if err != nil {
+		return fmt.Errorf("set credentials failed (key=%v username=%v): %w", key, username, err)
+	}
 	credPair := CredentialPair{
 		Username:          username,
 		EncryptedPassword: B64Encoding.EncodeToString(encryptedPassword),
 	}
 	cf.Credentials[key] = credPair
+	return nil
 }
 
 func (cf CredentialFile) DelCredentials(key string) {

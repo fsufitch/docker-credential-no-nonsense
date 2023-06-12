@@ -8,13 +8,12 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"io"
 )
 
 // Salt to apply to AES cipher generation
 // From: dd if=/dev/urandom bs=1 count=64 | base64
 const aesSalt = "dcOS3SD7EHiT4gZKh/OYDcWGzHbVD/TCaP4z21SBOR7iExE3enJ0MTa/ZIlvW0mgKMeeFH8wvBWAuvz3QOZkww"
-
-const saltSplitter = "++salt:data++"
 
 type Encryption struct {
 	block cipher.Block
@@ -38,28 +37,32 @@ func NewEncryption(encryptionKey string) (*Encryption, error) {
 	return &Encryption{ciph}, nil
 }
 
-func (enc Encryption) Encrypt(data []byte) []byte {
-	salt := make([]byte, 16)
-	rand.Read(salt)
+func (enc Encryption) Encrypt(data []byte) ([]byte, error) {
+	iv := enc.makeIV()
 
-	inputBuf := bytes.Buffer{}
-	inputBuf.Write(salt)
-	inputBuf.Write([]byte(saltSplitter))
-	inputBuf.Write(data)
+	src := bytes.NewReader(data)
+	dest := bytes.Buffer{}
+	dest.Write(iv)
 
-	output := []byte{}
-	enc.block.Encrypt(output, inputBuf.Bytes())
-	return output
+	writer := cipher.StreamWriter{W: &dest, S: cipher.NewOFB(enc.block, iv)}
+	if _, err := io.Copy(writer, src); err != nil {
+		return nil, fmt.Errorf("encryption failed: %w", err)
+	}
+	return dest.Bytes(), nil
 }
 
 func (enc Encryption) Decrypt(data []byte) ([]byte, error) {
-	saltedOutput := []byte{}
-	enc.block.Decrypt(saltedOutput, data)
-	_, decryptedOutput, ok := bytes.Cut(saltedOutput, []byte(saltSplitter))
-	if !ok {
-		return nil, errors.New("input data did did not include a salt")
+	iv := data[:enc.block.BlockSize()]
+	data = data[enc.block.BlockSize():]
+
+	src := bytes.NewReader(data)
+	reader := cipher.StreamReader{R: src, S: cipher.NewOFB(enc.block, iv)}
+
+	decryptedData, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("decryption failed: %w", err)
 	}
-	return decryptedOutput, nil
+	return decryptedData, nil
 }
 
 func (enc Encryption) Reencrypt(data []byte) ([]byte, error) {
@@ -67,5 +70,11 @@ func (enc Encryption) Reencrypt(data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return enc.Encrypt(decrypted), nil
+	return enc.Encrypt(decrypted)
+}
+
+func (enc Encryption) makeIV() []byte {
+	iv := make([]byte, enc.block.BlockSize())
+	rand.Read(iv)
+	return iv
 }

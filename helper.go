@@ -18,7 +18,10 @@ func (h Helper) Add(c *dkrcred.Credentials) error {
 		return errFailed(err)
 	}
 
-	credsFile.SetCredentials(h.Encryption, c.ServerURL, c.Username, c.Secret)
+	err = credsFile.SetCredentials(h.Encryption, c.ServerURL, c.Username, c.Secret)
+	if err != nil {
+		return errFailed(err)
+	}
 
 	err = credsFile.Save(h.CredsFilePath)
 	if err != nil {
