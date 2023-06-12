@@ -3,15 +3,16 @@ SOURCES := go.mod go.sum $(shell find . -name '*.go')
 CMDPKG := ./cmd/docker-credential-no-nonsense
 
 # See possibilities with "go tool dist list"
-DISTS ?= linux/amd64 windows/amd64
-
-.DEFAULT: dists
-
+DISTS ?=
 
 default:
 	echo ${SOURCES}
+	DISTS='${DISTS}'; \
 	TARGETS=''; \
-	for dist in $$(echo '${DISTS}' | grep -Eo '\S+'); do \
+	if [ -z "$$DISTS"]; then \
+		DISTS=$$(eval "$$(go tool dist env) echo \$$GOOS/\$$GOARCH"); \
+	fi; \
+	for dist in $$(echo "$$DISTS" | grep -Eo '\S+'); do \
 		if [ -z "$$(echo $$dist | grep '^windows/')" ]; then \
 			SUFFIX=''; \
 		else \
@@ -19,7 +20,7 @@ default:
 		fi; \
 		TARGETS="$$TARGETS dist/$$dist/docker-credential-no-nonsense$$SUFFIX"; \
 	done; \
-	make $$TARGETS;
+	echo DISTS $$DISTS && echo TARGETS $$TARGETS && make $$TARGETS;
 .PHONY: default
 
 

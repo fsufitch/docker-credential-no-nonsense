@@ -23,3 +23,16 @@ ENV PATH=/home/developer/go/bin:${PATH}
 
 CMD ["echo", "devcontainer should have its command overridden by the IDE"]
 
+##########
+# Make-based builder
+# Mount your source dir to /app
+##########
+
+FROM fedora:37 AS make
+
+RUN dnf install -y go make && dnf clean all
+
+VOLUME /app
+WORKDIR /app
+
+CMD [ "make" ]

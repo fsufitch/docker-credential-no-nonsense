@@ -1,13 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/adrg/xdg"
-	dkrcred "github.com/docker/docker-credential-helpers/credentials"
+	"github.com/docker/docker-credential-helpers/credentials"
 	dkr_nn "github.com/fsufitch/docker-credential-no-nonsense"
-	"github.com/manifoldco/promptui"
+	"golang.org/x/exp/slices"
 )
 
 // This file implements the docker credentials protocol
@@ -21,16 +23,10 @@ func getDefaultCredFilePath() (string, error) {
 
 func getEncryptionKey() (string, error) {
 	encKey := os.Getenv(NO_NONSENSE_ENC_KEY)
-	if encKey != "" {
-		return encKey, nil
+	if encKey == "" {
+		return "", errors.New("NO_NONSENSE_ENC_KEY not set; it is required for interacting with the credfile")
 	}
-	fmt.Fprintln(os.Stderr, "No password in NO_NONSENSE_ENC_KEY variable")
-	prompt := promptui.Prompt{
-		Label:       "Encryption Key: ",
-		Mask:        '.',
-		HideEntered: true,
-	}
-	return prompt.Run()
+	return encKey, nil
 }
 
 func getCredFilePath() (string, error) {
@@ -58,15 +54,30 @@ func initEncryption() (*dkr_nn.Encryption, error) {
 	return enc, nil
 }
 
+var executable string
+
+func init() {
+	executable, _ = os.Executable()
+	executable = path.Base(executable)
+}
+
 func main() {
-	enc, err := initEncryption()
-	if err != nil {
-		panic(err)
-	}
 
 	path, err := getCredFilePath()
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, fmt.Errorf("%s: %w", executable, err))
+		os.Exit(1)
+	}
+
+	if slices.Contains(os.Args, "--where") {
+		fmt.Println(path)
+		return
+	}
+
+	enc, err := initEncryption()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, fmt.Errorf("%s: %w", executable, err))
+		os.Exit(1)
 	}
 
 	helper := dkr_nn.Helper{
@@ -74,6 +85,5 @@ func main() {
 		CredsFilePath: path,
 	}
 
-	dkrcred.Serve(helper)
-
+	credentials.Serve(helper)
 }
