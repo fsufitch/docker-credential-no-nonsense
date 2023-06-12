@@ -32,7 +32,9 @@ This package is executed by the official Docker credential helper entrypoint. Th
 
     Usage: docker-credential-no-nonsense <store|get|erase|list|version>
 
-It can be configured via environment variables:
+To make Docker use it, edit your Docker config (`~/.docker/config.json`) and set `"credsStore": "no-nonsense"`.
+
+The credential helper can be configured via environment variables:
 
 **`NO_NONSENSE_ENC_KEY`** (required!). This is the encryption key proper, for encrypting/decrypting the secrets in the JSON storage. It is required and must be supplied via the environment variable. This is because it is the only way that Docker can pass the value through to the point where it internally uses the helper. **You must set this variable before using any `docker` commands.
 

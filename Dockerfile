@@ -35,4 +35,4 @@ RUN dnf install -y go make && dnf clean all
 VOLUME /app
 WORKDIR /app
 
-CMD [ "make" ]
+CMD [ "make", "GOARGS=-buildvcs=false" ]
