@@ -1,0 +1,17 @@
+bash-completion
+curl
+file
+git
+golang
+gzip
+gnupg2
+hostname
+htop
+iputils
+man-db
+net-tools
+openssh-clients
+sudo
+tar
+vim
+xz

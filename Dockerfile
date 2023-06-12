@@ -6,8 +6,7 @@ FROM fedora:37 AS devcontainer
 # Install stuff necessary for a reasonable CLI
 COPY devcontainer-packages.txt /opt
 RUN dnf install -y $(cat /opt/devcontainer-packages.txt) && \
-    rm -rf /var/cache/dnf && \
-    npm i -g node npm
+    dnf clean all
 
 # Set up the devcontainer user
 RUN useradd -ms /bin/bash developer
