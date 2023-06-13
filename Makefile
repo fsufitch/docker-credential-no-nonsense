@@ -9,7 +9,7 @@ default:
 	echo ${SOURCES}
 	DISTS='${DISTS}'; \
 	TARGETS=''; \
-	if [ -z "$$DISTS"]; then \
+	if [ -z "$$DISTS" ]; then \
 		DISTS=$$(eval "$$(go tool dist env) echo \$$GOOS/\$$GOARCH"); \
 	fi; \
 	for dist in $$(echo "$$DISTS" | grep -Eo '\S+'); do \

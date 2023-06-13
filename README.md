@@ -16,13 +16,13 @@ To install the credential helper, check the release downloads for your platform.
 
     make
 
-The Makefile can also receive `DISTS` and `GOARGS` variables in order to build for a different system (or systems). For example, this will be very verbose and build the code for Linux AMD64 and Windows ARM64:
+The Makefile can also receive `DISTS` and `GOARGS` variables in order to build for a different system (or systems). For example, this will be very verbose and build the code for Linux AMD64 and MacOS ARM64:
 
-    make DISTS='linux/amd64 windows/arm64' GOARGS='-x -v'
+    make DISTS='linux/amd64 darwin/arm64' GOARGS='-x -v'
 
-**If you don't have Go,** but do have Docker, you can try this instead:
+**If you don't have Go,** but do have Docker, you can try this instead. Remember to replace the `DISTS` value with the target platform, since Docker is always Linux no matter what your host is.
 
-    docker build -q --target make . | xargs docker run -v "$(pwd):/app"
+    docker build -q --target make . | xargs docker run -v "$(pwd):/app" DISTS=darwin/arm64
 
 **If you don't have Docker**, I'm not sure why this project is of interest. 
 
