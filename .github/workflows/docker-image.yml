@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: CI Build and Release Tags
 
 on:
   push:
@@ -11,15 +11,12 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y tar gzip
+        sudo apt-get update && sudo apt-get install -y golang make tar gzip
     
     - uses: actions/checkout@v3
 
-    - name: Build the builder Docker image
-      run: docker build --target make --tag make .
-
-    - name: Multi-platform build using Docker
-      run: docker run -v "$(pwd):/app" -e DISTS='linux/amd64 windows/amd64 darwin/amd64 darwin/arm64' make -j
+    - name: Build
+      run: make -j DISTS='linux/amd64 windows/amd64 darwin/amd64 darwin/arm64'
 
     - name: Create archives
       run: |
