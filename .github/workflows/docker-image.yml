@@ -25,7 +25,7 @@ jobs:
           for ARCH in $(ls "$DIST/$OS"); do
             ZIPFILE="docker-credential-no-nonsense_${OS}_${ARCH}.zip"
             echo "Archive $ZIPFILE"
-            (cd "$DIST/$OS/$ARCH"; zip -r -9 "$ZIPFILE" .)
+            (cd "$DIST/$OS/$ARCH"; zip -r -9 "$DIST/$ZIPFILE" .)
           done
         done
 
