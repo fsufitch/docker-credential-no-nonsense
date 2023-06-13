@@ -58,7 +58,9 @@ func Load(path string) (*CredentialFile, error) {
 }
 
 func (cf CredentialFile) Save(path string) error {
-	data, err := json.Marshal(cf)
+	stampedData := cf
+	stampedData.Timestamp = time.Now()
+	data, err := json.Marshal(stampedData)
 	if err != nil {
 		return fmt.Errorf("could not serialize cred file: %w", err)
 	}
