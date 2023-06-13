@@ -2,7 +2,7 @@ name: CI Build and Release Tags
 
 on:
   push:
-    tags: "**"
+    tags: "v**"
   workflow_dispatch:
 
 jobs:
@@ -30,4 +30,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
-        title: MyReleaseMessage
+        title: ${{ github.ref_name }}
