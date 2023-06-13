@@ -20,7 +20,8 @@
 				"github.vscode-pull-request-github",
 				"ms-vscode.remote-repositories",
 				"golang.go",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"GitHub.vscode-github-actions"
 			],
             "settings": {
                 "remote.containers.cacheVolume": true
