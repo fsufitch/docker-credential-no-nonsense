@@ -10,7 +10,7 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        apt-get update && apt-get install tar gzip
+        sudo apt-get update && sudo apt-get install -y tar gzip
     
     - uses: actions/checkout@v3
 
