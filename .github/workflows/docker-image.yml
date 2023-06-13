@@ -1,0 +1,36 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install dependencies
+      run: |
+        apt-get update && apt-get install tar gzip
+    
+    - uses: actions/checkout@v3
+
+    - name: Build the builder Docker image
+      run: docker build --target make --tag make .
+
+    - name: Multi-platform build using Docker
+      run: docker run -v "$(pwd):/app" -e DISTS='linux/amd64 windows/amd64 darwin/amd64 darwin/arm64' make -j
+
+    - name: Create archives
+      run: |
+        cd dist
+        for version in $(ls); do
+          tar cvvfz "docker-credential-no-nonsense_$version.tar.gz" "$version"
+        done
+
+    - name: Create Release
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        artifacts: dist/*.tar.gz
+        makeLatest: true
